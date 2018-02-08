@@ -18,3 +18,10 @@ function mousePressed(){
   fill(random(255), random(255), random(255), random(255));
   rect(mouseX, mouseY, random(100), random(100));
 }
+
+function deviceShaken(){
+  fill(0,0,0);
+  textFont("Times New Roman");
+  textAlign(CENTER);
+  text("OOF", random(width), random(height));
+}
