@@ -1,26 +1,26 @@
-let x = 100;
-let y = 100;
-let pos;
-let vel;
-let acc;
-let velVal;
-let accVal;
-function setup(){
+
+function setup() {
   createCanvas(windowWidth, windowHeight);
-  velVal = createVector(5,0);
-  accVal = createVector(5,10);
+
 }
 
-function draw(){
+function draw() {
   //background(255);
-  makeBall();
+  ball = new Ball(100, 100, 20);
+  ball.move();
+//  ball.render();
 }
 
-function makeBall(){
-  pos = createVector(x,y);
-  vel = velVal;
-  acc = accVal;
-  vel.add(acc);
-  pos.add(vel);
-  ellipse(pos.x, pos.y, 20);
+function Ball(x, y, r) {
+  this.pos = createVector(x, y);
+  this.vel = createVector(5, 5);
+  this.acc = createVector(5, 5);
+  this.move = function(){
+    this.pos.add(this.vel);
+    this.vel.add(this.acc);
+    ellipse(this.pos.x, this.pos.y, r);
+  }
+  // this.render = function(){
+  //   ellipse(this.pos.x, this.pos.y, r);
+  // }
 }
