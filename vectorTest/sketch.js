@@ -3,12 +3,13 @@ let ball1;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  ball = new Ball(0, 0, 20, 10, 10, 0, 0);
+  ball = new Ball(100, 100, 20, 0, 0, 0, 0.98);
   //ball1 = new Ball(200, 100, 20, 10, 0, -1, 0);
 
 }
 
 function draw() {
+  background(255);
   ball.move();
   //ball1.move();
   ball.animate();
@@ -27,12 +28,15 @@ class Ball {
   }
   move() {
 
-    if (this.pos.x > width || this.pos.x < 0){
+    if (this.pos.x >= width || this.pos.x <= 0) {
       this.vel.x *= -1;
+
       //this.accel.x *= 0.1;
     }
-    if (this.pos.y > height || this.pos.y < 0){
-      this.vel.y *= -1;
+    if (this.pos.y >= height || this.pos.y <= 0) {
+      this.vel.y *= -1
+      print(this.vel.y);
+
       //this.accel.y *= 0.1;
     }
     this.pos.add(this.vel);
