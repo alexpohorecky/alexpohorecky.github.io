@@ -1,80 +1,57 @@
-let balls = [];
-ballExists = false;
-function setup() {
-  // document.body.style.overflow = 'visible';
-  createCanvas(windowWidth, windowHeight);
-  //ball = new Ball(100, 500, 20, 10, 0, 0, 1);
-  //ball1 = new Ball(200, 100, 20, 10, 0, -1, 0);
+// Alex Pohorecky
+// Monday, February 26, 2018
+// Computer Science 30, Period 5
+// Bouncing Balls Simulator
+// Extra For Experts:
+// I used a random function to generate randomly colored balls.
+// I used the class-type to create the ball object, which wasn't taught in class.
 
+let balls = [];
+let energyLostOnBounce = 5;
+let friction = 0.01;
+let horizontalVelocity = 0;
+let verticalVelocity = 0;
+let ballRadius = 20;
+let gravity = 0.98;
+
+function setup() {
+
+  createCanvas(windowWidth, windowHeight);
 }
 
 function draw() {
-  background(255);
-  for (let ball of balls){
-  //if (ballExists){
-  ball.move();
-  //print(ball.vel.y)
-  //ball1.move();
-  ball.animate();
-  //ball1.animate();
-}
-}
-function mouseClicked(){
-  //ballExists = true;
-  //ball = new Ball(mouseX, mouseY, 20, 10, 0, 0, 1);
-  balls.push(new Ball(mouseX, mouseY, 20, 10, 0, 0, 1));
-}
-class Ball {
-  constructor(_x, _y, _r, xVelocity, yVelocity, xAcceleration, yAcceleration) {
-    this.x = _x;
-    this.y = _y;
-    this.r = _r;
-
-    this.pos = createVector(this.x, this.y);
-    this.vel = createVector(xVelocity, yVelocity);
-    this.accel = createVector(xAcceleration, yAcceleration);
+  background(200);
+  fill(0)
+  text("Horizontal Velocity: " + horizontalVelocity, 5, 10);
+  text("Vertical Velocity: " + -1 * verticalVelocity, 5, 25);
+  text("Ball Radius: " + ballRadius, 5, 40);
+  for (let ball of balls) {
+    ball.move();
+    ball.animate();
   }
-  move() {
+}
 
-    if (this.pos.x > width - this.r || this.pos.x < 0 + this.r) {
-
-      if (this.vel.x < 0){
-        //this.vel.x += 5 * this.vel.x;
-      }
-      else{
-        //this.vel.x -= 5 * this.vel.x;
-      }
-      this.vel.x *= -1;
-
-      //this.accel.x *= 0.1;
-    }
-    if (this.pos.y > height - this.r || this.pos.y < 0 + this.r) {
-      if (this.vel.y < 0){
-        this.vel.y += 5 * this.accel.y;
-      }
-      else{
-        this.vel.y -= 5 * this.accel.y;
-      }
-      this.vel.y *= -1
-
-      //this.accel.y *= 0.1;
-    }
-    if (this.pos.x < 0 + this.r){
-      this.pos.x = 0 + this.r;
-    }
-    if (this.pos.x > width - this.r){
-      this.pos.x = width - this.r;
-    }
-    if (this.pos.y < 0 + this.r){
-      this.pos.y = 0 + this.r;
-    }
-    if (this.pos.y > height - this.r){
-      this.pos.y = height - this.r;
-    }
-    this.pos.add(this.vel);
-    this.vel.add(this.accel);
+function mouseClicked() {
+  balls.push(new Ball(mouseX, mouseY, ballRadius, horizontalVelocity, verticalVelocity, 0, gravity, random(255), random(255), random(255)));
+}
+function mouseWheel(event){
+  ballRadius -= event.delta;
+  return false;
+}
+function keyPressed(){
+  if (keyCode === 32){ // If the Spacebar is pressed
+    balls = [];
   }
-  animate() {
-    ellipse(this.pos.x, this.pos.y, this.r);
+  if (keyCode === LEFT_ARROW){
+    horizontalVelocity -= 1;
+  }
+  if (keyCode === RIGHT_ARROW){
+    horizontalVelocity += 1;
+  }
+  if (keyCode === UP_ARROW){
+    verticalVelocity -= 1;
+  }
+  if (keyCode === DOWN_ARROW){
+    verticalVelocity += 1;
   }
 }
