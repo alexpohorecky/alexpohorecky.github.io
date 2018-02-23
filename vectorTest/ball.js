@@ -22,14 +22,16 @@ class Ball {
     if (this.pos.y > height - this.r || this.pos.y < 0 + this.r) {
       // Lose vertical speed due to not perfectly ellastic collision
       if (this.vel.y < 0) {
-        this.vel.y += energyLostOnBounce * this.accel.y;
-      } else {
-        this.vel.y -= energyLostOnBounce * this.accel.y;
+        this.vel.y += elasticity * this.accel.y;
+      }
+      else {
+        this.vel.y -= elasticity * this.accel.y;
       }
       // Lose horizontal speed due to friction
       if (this.vel.x < 0) {
         this.vel.x += -1 * friction * this.vel.x;
-      } else {
+      }
+      else {
         this.vel.x -= friction * this.vel.x;
       }
       // Ball bounces
@@ -48,7 +50,9 @@ class Ball {
     if (this.pos.y > height - this.r) {
       this.pos.y = height - this.r;
     }
+    // Velocity affects position
     this.pos.add(this.vel);
+    // Acceleration affects velocity
     this.vel.add(this.accel);
   }
   animate() {
