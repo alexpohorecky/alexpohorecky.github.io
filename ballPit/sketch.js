@@ -22,7 +22,7 @@ function setup() {
 function draw() {
   if (menuState){
     menu();
-    if (width/3 < mouseX < 2*width/3 && height/3 < mouseY < 2*height/3 && mouseIsPressed){
+    if ( mouseX > width/3  && mouseX < 2*width/3 &&  mouseY > height/3 && mouseY < 2*height/3 && mouseIsPressed){
       menuState = false;
     }
   }
