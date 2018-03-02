@@ -20,13 +20,13 @@ function setup() {
 }
 
 function draw() {
-  if (menuState){
-    menu();
-    if ( mouseX > width/3  && mouseX < 2*width/3 &&  mouseY > height/3 && mouseY < 2*height/3 && mouseIsPressed){
-      menuState = false;
-    }
-  }
-  else{
+  // if (menuState){
+  //   menu();
+  //   if ( mouseX > width/3  && mouseX < 2*width/3 &&  mouseY > height/3 && mouseY < 2*height/3 && mouseIsPressed){
+  //     menuState = false;
+  //   }
+  // }
+  // else{
   background(200);
   fill(0)
   text("Click anywhere to create a ball.\nUse the right and left arrow keys to change horizontal velocity.\nUse the up and down arrow keys to change vertical velocity.\nPress r to reset velocity, press spacebar to clear balls.", 5, 10);
@@ -39,11 +39,11 @@ function draw() {
     ball.move();
     ball.animate();
   }
-  if (keyIsPressed && keyCode === 27){
-    menuState = true;
-  }
-
-}
+//   if (keyIsPressed && keyCode === 27){
+//     menuState = true;
+//   }
+//
+// }
 }
 
 function mouseClicked() {
