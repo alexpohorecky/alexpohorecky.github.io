@@ -1,16 +1,18 @@
 let pointSpacing;
 function setup(){
-  createCanvas(800, 800);
+  createCanvas(windowWidth, windowHeight);
   pointSpacing = 50;
+  noCursor();
 }
 
 function draw(){
   background(0);
   for (let i = pointSpacing; i < width; i+= pointSpacing){
     for (let j = pointSpacing; j < height; j += pointSpacing){
-      stroke(255);
-      point(i,j);
-      line(width/2, height/2, i, j);
+      stroke(255, 20);
+      //fill(255);
+      //ellipse(i,j,3);
+      line(mouseX, mouseY, i, j);
     }
   }
 }
