@@ -1,14 +1,22 @@
 let ball;
+let gravity
 function setup(){
   createCanvas(windowWidth, windowHeight);
-  ball = new Ball;
+  ball = new Ball(1,1,width/2,height/2);
+  gravity = createVector(0, 0.98);
 }
 
 function draw(){
-  ball.move();
-  ball.show();
-}
+  background(255)
 
+
+  ball.move();
+  ball.animate();
+}
+function mouseClicked(){
+  ball.applyForce(gravity);
+
+}
 class Ball{
   constructor(_mass, _density, _x, _y){
     this.mass = _mass;
@@ -21,18 +29,19 @@ class Ball{
     this.acceleration = createVector(0,0);
     this.netForce = createVector(0,0);
   }
-  this.applyForce = function(force){
+  applyForce(force){
     this.netForce.add(force);
 
 
   }
-  this.move = function(){
-    this.acceleration.add(this.netForce);
+  move(){
+    this.acceleration.add(this.netForce/this.mass);
     this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
     this.netForce.mult(0);
   }
-  this.show = function(){
-    ellipse(this.position.x, this.position.y, this.radius);
+  animate(){
+
+    ellipse(this.position.x, this.position.y, 20);
   }
 }
