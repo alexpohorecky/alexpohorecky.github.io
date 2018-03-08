@@ -1,22 +1,20 @@
 let ball;
-let gravity
+let gravity;
+let drag;
 function setup(){
   createCanvas(windowWidth, windowHeight);
-  ball = new Ball(1,1,width/2,height/2);
-  gravity = createVector(0, 0.98);
+  ball = new Ball(5,1,width/2,height/2);
+  gravity = createVector(0, (ball.mass * (6.67408e-11) * (5.972e24))/sq(((height - ball.position.y) +6.371e6)));
+  drag = createVector(dragC * fluidDensity * )
 }
 
 function draw(){
   background(255)
-
-
+  ball.applyForce(gravity);
   ball.move();
   ball.animate();
 }
-function mouseClicked(){
-  ball.applyForce(gravity);
 
-}
 class Ball{
   constructor(_mass, _density, _x, _y){
     this.mass = _mass;
@@ -31,11 +29,12 @@ class Ball{
   }
   applyForce(force){
     this.netForce.add(force);
+    this.netForce.div(this.mass);
 
 
   }
   move(){
-    this.acceleration.add(this.netForce/this.mass);
+    this.acceleration.add(this.netForce);
     this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
     this.netForce.mult(0);
