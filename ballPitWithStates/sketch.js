@@ -39,9 +39,6 @@ function draw() {
     ball.move();
     ball.animate();
   }
-  if (keyIsPressed && keyCode === 27){
-    menuState = true;
-  }
 
 }
 }
@@ -84,5 +81,9 @@ function keyPressed(){
     // Reset all modifiers to their default values
     verticalVelocity = 0;
     horizontalVelocity = 0;
+  }
+  // If the ESCAPE key is pressed...
+  if (keyCode === 27){
+    menuState = !menuState
   }
 }
