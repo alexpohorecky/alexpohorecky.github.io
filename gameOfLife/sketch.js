@@ -7,32 +7,13 @@ Based on John Horton Conway's Game of Life (1970)
 
 Basic Rules:
 
-    Any live cell with less than two live neighbours dies on the next generation.
-    Any live cell with two or three live neighbours lives on the next generation.
-    Any live cell with greater than three live neighbours dies on the next generation.
-    Any dead cell with exactly three neighbours becomes live on the next generation.
+    1. Any live cell with less than two live neighbours dies on the next generation.
+    2. Any live cell with two or three live neighbours lives on the next generation.
+    3. Any live cell with greater than three live neighbours dies on the next generation.
+    4. Any dead cell with exactly three neighbours becomes live on the next generation.
 
-Added Rules (Advanced Mode):
-
-    Predator Cells:
-        If x number of cells are alive at any given time, there is a chance a predator will spawn.
-        If the predator is neighbours to a live cell, it will kill it and move into its place.
-        If there are multiple live neighbours, the predator will randomly choose one to eat.
-        If the predator eats x number of cells, it will spawn another predator beside it.
-        Predators are not cannibalistic.
-        If there are no live cells as neighbours, the predator will move to a random cell adjacent.
-        If the predator does not eat in x generations, it will starve.
-
-    Pathogens:
-        Each cell has an immune system.
-        Every time something is born, it has a small chance of carrying a pathogen.
-        Each pathogen has lethality.
-        When an infected cell is neighbours with a healthy cell,  the pathogen's lethality is compared to the neighbour's immune system.
-        If the pathogen's lethality overcomes a healthy cell's immune system, the cell becomes infected.
-        An infected cell's immune system will reduce a pathogen's lethality for each generation it is infected.
-        While the pathogen's lethality is greater than the cell's immune system, there is a chance the cell will die.
-        Once the infected cell's immune system overcomes the pathogen, the cell becomes healthy and has an increased immune system.
-        A cell's base immune system is governed by the immune systems of its neighbours upon birth.
+All of the rules work except for rule 4, which for some reason (I haven't been able 
+to figure out why) doesn't grow a new cell with 3 neighbours, but still grows cells.
 
 */
 
