@@ -51,4 +51,5 @@ class Monimo {
   dropDown(){
     this.y++;
   }
+
 }
