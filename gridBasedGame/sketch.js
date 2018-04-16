@@ -29,7 +29,6 @@ function setup(){
 }
 
 function draw(){
-  background(200);
   showArena();
   showPlayer();
   deltaTime = millis();
@@ -46,12 +45,18 @@ function keyPressed(){
     if (player.x < 0){
       player.x = 0;
     }
+    if (arena[player.x][player.y] === 1){
+      player.x++;
+    }
 
   }
   if (keyCode === 39){
     player.x++;
     if (player.x >= arenaWidth){
       player.x = arenaWidth - 1;
+    }
+    if (arena[player.x][player.y] === 1){
+      player.x--;
     }
   }
   if (keyCode === 40){
@@ -83,11 +88,16 @@ function dropPlayer(){
   player.y++;
   if (player.y === arenaHeight){
     placePiece(arena, player);
+    spawnPlayer();
+  }
+  if (arena[player.x][player.y] === 1){
+      placePiece(arena, player);
+       spawnPlayer();
   }
 }
 
 function placePiece(arena, player){
-  arena[player.x][player.y] = player.value;
+  arena[player.x][player.y - 1] = player.value;
 }
 
 function showArena(){
@@ -97,6 +107,11 @@ function showArena(){
         fill(0);
         rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
       }
+      if (arena[i][j] === 0){
+        fill(200);
+        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
+      }
+
     }
   }
 }
