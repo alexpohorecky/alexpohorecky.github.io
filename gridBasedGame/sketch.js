@@ -34,6 +34,7 @@ function draw(){
   deltaTime = millis();
   if (deltaTime - time >= hangTime){
     dropPlayer();
+    checkArena();
     time = deltaTime;
   }
 
@@ -65,9 +66,9 @@ function keyPressed(){
 }
 
 function create2DArray(gridWidth, gridHeight){
-  let grid = Array(gridWidth);
-  for (let i = 0; i < gridWidth; i++){
-    grid[i] = Array(gridHeight);
+  let grid = Array(gridHeight);
+  for (let i = 0; i < gridHeight; i++){
+    grid[i] = Array(gridWidth);
     grid[i].fill(0);
   }
 
@@ -111,6 +112,18 @@ function showArena(){
         fill(200);
         rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
       }
+
+    }
+  }
+}
+
+function checkArena(){
+  for (let i = 0; i < arenaWidth; i++){
+    for (let j = 0; j < arenaHeight; j++){
+      if (arena[i][j] === 0){
+        break;
+      }
+      arena[i].fill(0);
 
     }
   }
