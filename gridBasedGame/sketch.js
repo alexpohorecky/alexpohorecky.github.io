@@ -90,7 +90,7 @@ function dropPlayer(){
     placePiece(arena, player);
     spawnPlayer();
   }
-  if (arena[player.x][player.y] === 1){
+  if (arena[player.y][player.x] === 1){
       placePiece(arena, player);
       spawnPlayer();
   }
@@ -98,12 +98,19 @@ function dropPlayer(){
 }
 
 function placePiece(arena, player){
-  arena[player.x][player.y - 1] = player.value;
+  arena[player.y - 1][player.x] = player.value;
 }
 
 function showArena(){
   for (let i = 0; i < arenaHeight; i++){
     for (let j = 0; j < arenaWidth; j++){
+<<<<<<< HEAD
+=======
+      if (arena[i][j] === 1){
+        fill(0);
+        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
+      }
+>>>>>>> a4b3c56598c057b1a9800ad01ec074f0439963f3
       if (arena[i][j] === 0){
         fill(200);
         rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
@@ -119,10 +126,17 @@ function showArena(){
 }
 
 function checkArena(){
+<<<<<<< HEAD
     outer: for (let i = 0; i < arenaWidth; i++){
     for (let j = 0; j < arenaHeight; j++){
       if (arena[j][i] === 0){
         continue outer;
+=======
+  for (let i = 0; i < arenaHeight; i++){
+    for (let j = 0; j < arenaWidth; j++){
+      if (arena[i][j] === 0){
+        break;
+>>>>>>> a4b3c56598c057b1a9800ad01ec074f0439963f3
       }
       arena[i].fill(0);
 
