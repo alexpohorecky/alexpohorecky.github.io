@@ -11,9 +11,9 @@ let player = {
 
 let arena;
 let arenaWidth = 10;
-let arenaHeight = 20;
+let arenaHeight = 10;
 
-let monimoSize = 25;
+let monimoSize = 30;
 
 let hangTime = 1000;
 let time = 0;
@@ -34,7 +34,6 @@ function draw(){
   deltaTime = millis();
   if (deltaTime - time >= hangTime){
     dropPlayer();
-    checkArena();
     time = deltaTime;
   }
 
@@ -93,8 +92,9 @@ function dropPlayer(){
   }
   if (arena[player.x][player.y] === 1){
       placePiece(arena, player);
-       spawnPlayer();
+      spawnPlayer();
   }
+  checkArena();
 }
 
 function placePiece(arena, player){
@@ -102,26 +102,27 @@ function placePiece(arena, player){
 }
 
 function showArena(){
-  for (let i = 0; i < arenaWidth; i++){
-    for (let j = 0; j < arenaHeight; j++){
-      if (arena[i][j] === 1){
-        fill(0);
-        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
-      }
+  for (let i = 0; i < arenaHeight; i++){
+    for (let j = 0; j < arenaWidth; j++){
       if (arena[i][j] === 0){
         fill(200);
         rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
       }
+      if (arena[i][j] === 1){
+        fill(0);
+        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
+      }
+
 
     }
   }
 }
 
 function checkArena(){
-  for (let i = 0; i < arenaWidth; i++){
+    outer: for (let i = 0; i < arenaWidth; i++){
     for (let j = 0; j < arenaHeight; j++){
-      if (arena[i][j] === 0){
-        break;
+      if (arena[j][i] === 0){
+        continue outer;
       }
       arena[i].fill(0);
 
