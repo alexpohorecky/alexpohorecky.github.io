@@ -13,9 +13,9 @@ let arena;
 let arenaWidth = 10;
 let arenaHeight = 10;
 
-let monimoSize = 30;
+let monimoSize = 25;
 
-let hangTime = 1000;
+let hangTime = 500;
 let time = 0;
 let deltaTime;
 
@@ -45,7 +45,7 @@ function keyPressed(){
     if (player.x < 0){
       player.x = 0;
     }
-    if (arena[player.x][player.y] === 1){
+    if (arena[player.x][player.y] > 0){
       player.x++;
     }
 
@@ -55,7 +55,7 @@ function keyPressed(){
     if (player.x >= arenaWidth){
       player.x = arenaWidth - 1;
     }
-    if (arena[player.x][player.y] === 1){
+    if (arena[player.x][player.y] > 0){
       player.x--;
     }
   }
@@ -65,9 +65,9 @@ function keyPressed(){
 }
 
 function create2DArray(gridWidth, gridHeight){
-  let grid = Array(gridHeight);
-  for (let i = 0; i < gridHeight; i++){
-    grid[i] = Array(gridWidth);
+  let grid = Array(gridWidth);
+  for (let i = 0; i < gridWidth; i++){
+    grid[i] = Array(gridHeight);
     grid[i].fill(0);
   }
 
@@ -77,10 +77,11 @@ function create2DArray(gridWidth, gridHeight){
 function spawnPlayer(){
   player.x = startPosition.x;
   player.y = startPosition.y;
+  player.value = ceil(random(0,7));
 }
 
 function showPlayer(){
-  fill(0);
+  fillMonimo(player.value);
   rect(player.x * monimoSize, player.y * monimoSize, monimoSize, monimoSize);
 }
 
@@ -89,57 +90,105 @@ function dropPlayer(){
   if (player.y === arenaHeight){
     placePiece(arena, player);
     spawnPlayer();
+    hangTime *= 0.99;
   }
-  if (arena[player.y][player.x] === 1){
+  if (arena[player.x][player.y] > 0){
       placePiece(arena, player);
       spawnPlayer();
+      hangTime *= 0.99;
   }
   checkArena();
 }
 
 function placePiece(arena, player){
-  arena[player.y - 1][player.x] = player.value;
+  arena[player.x][player.y-1] = player.value;
 }
 
 function showArena(){
-  for (let i = 0; i < arenaHeight; i++){
-    for (let j = 0; j < arenaWidth; j++){
-<<<<<<< HEAD
-=======
-      if (arena[i][j] === 1){
-        fill(0);
-        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
-      }
->>>>>>> a4b3c56598c057b1a9800ad01ec074f0439963f3
-      if (arena[i][j] === 0){
-        fill(200);
-        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
-      }
-      if (arena[i][j] === 1){
-        fill(0);
-        rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
-      }
+  for (let i = 0; i < arenaWidth; i++){
+    for (let j = 0; j < arenaHeight; j++){
+      fillMonimo(arena[i][j]);
+      rect(i * monimoSize, j * monimoSize, monimoSize, monimoSize);
+    }
+  }
+}
 
+// function checkArena(){
+//   for (let i = 0; i < arenaWidth; i++){
+//     for (let j = 0; j < arenaHeight; j++){
+//       let pieceValue = arena[i][j];
+//       let pieceStack =[[i,j]];
+//       let lastPiece = pieceStack[pieceStack.length - 1];
+//       for(let x = -1; x <= 1; x++){
+//         let currentPieceCoord = [i+x, j];
+//         if (!existInArray(currentPieceCoord, pieceStack) && arena[i+x,j] === pieceValue){
+//           pieceStack.push(currentPieceCoord);
+//         }
+//       }
+//       for(let y = -1; y <= 1; y++){
+//         let currentPieceCoord = [i, j + y];
+//         if (!existInArray(currentPieceCoord, pieceStack) && arena[i,j+y] === pieceValue){
+//           pieceStack.push(currentPieceCoord);
+//         }
+//       }
+//       if (pieceStack.length >= 4){
+//         for(let coord of pieceStack){
+//           arena[coord[0]].splice(coord[1], 1);
+//           arena[coord[0]].unshift(0);
+//         }
+//       }
+//     }
+//   }
+// }
+
+function checkArena(){
+  for (let i = 0; i < arenaWidth; i++){
+    for (let j = 0; j < arenaHeight; j++){
+      checkNeighbours(i, j, arena[i][j]);
 
     }
   }
 }
 
-function checkArena(){
-<<<<<<< HEAD
-    outer: for (let i = 0; i < arenaWidth; i++){
-    for (let j = 0; j < arenaHeight; j++){
-      if (arena[j][i] === 0){
-        continue outer;
-=======
-  for (let i = 0; i < arenaHeight; i++){
-    for (let j = 0; j < arenaWidth; j++){
-      if (arena[i][j] === 0){
-        break;
->>>>>>> a4b3c56598c057b1a9800ad01ec074f0439963f3
+function checkNeighbours(currentX, currentY, currentValue){
+  let neighbourCoords = []
+  for (let x = -1; x <= 1; x++){
+    currentNeighbourCoord = [currentX + x,currentY];
+    if ( currentNeighbourCoord === currentValue){
+      if (!existInArray(currentNeighbourCoord, neighbours)){
+        neighbourCoords.push(currentNeighbourCoord);
       }
-      arena[i].fill(0);
-
     }
   }
+  for (let y = -1; y <= 1; y++){
+    currentNeighbourCoord = [currentX,currentY + y];
+    if ( currentNeighbourCoord === currentValue){
+      if (!existInArray(currentNeighbourCoord, neighbours)){
+        neighbourCoords.push(currentNeighbourCoord);
+      }
+    }
+  }
+  for (let coord of neighbourCoords){
+    removeCoords(coord);
+  }
+}
+
+function removeCoords(coord){
+  arena[coord[0]].splice(coord[1], 1);
+  arena[coord[0]].unshift(0);
+}
+
+function existInArray(item, array){
+  for(let i = 0; i < array.length; i++){
+    if (array[i] === item){
+      return true;
+    }
+  }
+  return false;
+}
+
+
+function fillMonimo(value){
+  colorChoice = [200, "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Pink"];
+  fill(colorChoice[value]);
 }
