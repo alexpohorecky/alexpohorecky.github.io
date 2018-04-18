@@ -12,10 +12,15 @@ function draw(){
 
 class Timer{
   constructor(milliSeconds){
-    this.startTime = millis();
+    this.startTime;
+    this.timerStarted = false;
     this.waitTime = milliSeconds;
     this.isDone = false;
     this.finishTime = this.startTime + this.waitTime;
+  }
+  timerStart(){
+    this.startTime = millis();
+    this.timerStarted = true;
   }
   reset(milliSeconds){
     this.startTime = millis();
@@ -35,28 +40,40 @@ class Timer{
 
 class Bubble{
   constructor(_x,_y,_r, d){
-    this.wobbleDisplacement = d;
+    //this.wobbleDisplacement = d;
     this.x = _x;
     this.y = _y;
     this.r = _r;
-    this.xSpeed = 10;
+    //this.xSpeed = 10;
     this.ySpeed = -10;
-    this.wobblePlace = this.x + this.wobbleDisplacement;
+    //this.wobblePlace = this.x + this.wobbleDisplacement;
+    this.bubbleTimer = new Timer(1000);
 
   }
   move(){
-    this.x += this.xSpeed;
+    //this.x += this.xSpeed;
     this.y += this.ySpeed;
-    if (this.x === this.wobblePlace){
-      this.xSpeed *= -1;
-      this.wobbleDisplacement *= -1;
-      this.wobblePlace += 2 * this.wobbleDisplacement;
+    // if (this.x === this.wobblePlace){
+    //   this.xSpeed *= -1;
+    //   this.wobbleDisplacement *= -1;
+    //   this.wobblePlace += 2 * this.wobbleDisplacement;
+    // }
+    if (this.y <= this.r){
+      this.y = this.r;
+      this.ySpeed = 0;
+      if (!bubbleTimer.timerStarted){
+        this.bubbleTimer.timerStart();
+      }
+
     }
   }
   clicked(){
 
   }
   showBubble(){
-    ellipse(this.x,this.y,this.r);
+    if (!this.bubbleTimer.timerDone()){
+      ellipse(this.x,this.y,this.r);
+    }
+
   }
 }
