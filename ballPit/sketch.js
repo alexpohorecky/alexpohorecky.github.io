@@ -1,10 +1,4 @@
-// Alex Pohorecky
-// Monday, February 26, 2018
-// Computer Science 30, Period 5
-// Bouncing Balls Simulator
-// Extra For Experts:
-// I used a random function to generate randomly colored balls.
-// I used the class-type to create the ball object, which wasn't taught in class.
+
 
 let balls = [];
 let elasticity = 3;
@@ -29,9 +23,6 @@ function draw() {
   else{
   background(200);
   fill(0)
-  text("Click anywhere to create a ball.\nUse the right and left arrow keys to change horizontal velocity.\nUse the up and down arrow keys to change vertical velocity.\nPress r to reset velocity, press spacebar to clear balls.", 5, 10);
-  text("Horizontal Velocity: " + horizontalVelocity, 5, 70);
-  text("Vertical Velocity: " + -1 * verticalVelocity, 5, 85);
 
 
   // For every ball in the list balls...
