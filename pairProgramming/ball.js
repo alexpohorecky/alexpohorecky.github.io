@@ -9,6 +9,8 @@ class Ball {
 
     this.pos = createVector(this.x, this.y);
     this.vel = createVector(xVelocity, yVelocity);
+    this.unitNormalVel;
+    this.unitTangentVel;
     this.accel = createVector(xAcceleration, yAcceleration);
   }
   move() {
@@ -54,6 +56,8 @@ class Ball {
     this.pos.add(this.vel);
     // Acceleration affects velocity
     this.vel.add(this.accel);
+
+    this.unitNormalVel = 
   }
   animate() {
     fill(this.clrR, this.clrG, this.clrB);
