@@ -8,7 +8,7 @@ function preload(){
 }
 
 function setup(){
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1280, 800);
   document.documentElement.style.overflow = 'hidden';
   document.body.style.cursor = 'none';
 
