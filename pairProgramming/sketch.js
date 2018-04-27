@@ -7,7 +7,7 @@ function preload(){
 }
 
 function setup(){
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1280, 800);
   document.documentElement.style.overflow = 'hidden';
 
   image(backgroundGraphic,0,0, width, height);
