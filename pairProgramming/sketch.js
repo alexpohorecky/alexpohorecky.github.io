@@ -28,13 +28,13 @@ function draw(){
   strokeWeight(5);
 
   translate(width/2, 0);
-  ballLaunchPos = createVector(0,30);
+  ballLaunchPos = createVector(0,height/15);
   angleMode(DEGREES);
   push();
-  rotate(map(constrain(mouseX,104,590), 590, 104, -90, 90));
-  ballLaunchPos.rotate(map(constrain(mouseX,104,590), 590, 104, -90, 90));
+  rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
+  ballLaunchPos.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   imageMode(CENTER);
-  image(cannon,0,10,80,50);
+  image(cannon,0,height/56,height/6,height/10);
 
 
   pop();
@@ -47,5 +47,5 @@ function draw(){
 }
 
 function mouseClicked(){
-    balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,10,0,5,0,0,0,0,0));
+    balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,height/50,0,5,0,0,0,0,0));
 }

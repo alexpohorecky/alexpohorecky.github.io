@@ -10,52 +10,25 @@ class Ball {
     this.pos = createVector(this.x, this.y);
     this.vel = createVector(xVelocity, yVelocity);
     this.accel = createVector(xAcceleration, yAcceleration);
-    this.vel.rotate(map(constrain(mouseX,104,590), 590, 104, -90, 90));
+    this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   }
   move() {
-    // If a ball hits the wall...
-    // if (this.pos.x > width - this.r || this.pos.x < 0 + this.r) {
-    //   // Ball bounces
-    //   this.vel.x *= -1;
-    //
-    // }
-    // If a ball hits the floor or ceiling...
-    if (this.pos.y > height - this.r || this.pos.y < 0 + this.r) {
-      // Lose vertical speed due to not perfectly ellastic collision
-      if (this.vel.y < 0) {
-        this.vel.y += 3 * this.accel.y;
-      }
-      else {
-        this.vel.y -= 3 * this.accel.y;
-      }
-      // Lose horizontal speed due to friction
-      if (this.vel.x < 0) {
-        this.vel.x += -1 * 0.05 * this.vel.x;
-      }
-      else {
-        this.vel.x -= 0.05 * this.vel.x;
-      }
-      // Ball bounces
-      this.vel.y *= -1
-    }
-    // Ball bounces on its edge
-    // if (this.pos.x < 0 + this.r) {
-    //   this.pos.x = 0 + this.r;
-    // }
-    // if (this.pos.x > width - this.r) {
-    //   this.pos.x = width - this.r;
-    // }
-    if (this.pos.y < 0 + this.r) {
-      this.pos.y = 0 + this.r;
-    }
-    if (this.pos.y > height - this.r) {
-      this.pos.y = height - this.r;
-    }
     // Velocity affects position
     this.pos.add(this.vel);
     // Acceleration affects velocity
     this.vel.add(this.accel);
   }
+  bounce(){
+
+  }
+  checkPegCollision(pegArray){
+    for (let peg of pegArray){
+      if (dist(this.x, this.y, peg.x, peg.y) < this.r + peg.r){
+        bounce();
+      }
+    }
+  }
+
   animate() {
     fill(this.clrR, this.clrG, this.clrB);
     ellipse(this.pos.x, this.pos.y, this.r);
