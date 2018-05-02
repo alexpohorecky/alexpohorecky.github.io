@@ -18,13 +18,25 @@ class Ball {
     // Acceleration affects velocity
     this.vel.add(this.accel);
   }
-  bounce(){
+  bounce(collidedPeg){
+    this.normalVector = createVector(this.x - collidedPeg.x, this.y - collidedPeg.y);
+    this.unitNormalVector = this.normalVector.normalize();
+    this.unitTangentVector = createVector(-1*this.unitNormalVector.y, -1*this.unitNormalVector.x);
+    this.normalVelocityScalar = dot(this.velocity, this.unitNormalVector);
+    this.tangentVelocityScalar = dot(this.velocity, this.unitTangentVector);
+    this.normalVelocityScalar.mult(0);
+    this.normalVelocityScalarVector = this.normalVelocityScalar.mult(this.unitNormalVector);
+    this.tangentVelocityScalarVector = this.tangentVelocityScalar.mult(this.unitTangentVector);
+
+    this.velocity = this.normalVelocityScalarVector.add(this.tangentVelocityScalarVector);
+    collidedPeg.hit = true;
 
   }
   checkPegCollision(pegArray){
     for (let peg of pegArray){
-      if (dist(this.x, this.y, peg.x, peg.y) < this.r + peg.r){
-        bounce();
+      if (dist(this.x, this.y, peg.x, peg.y) < (this.r + peg.r)){
+        // bounce(peg);
+        peg.hit = true;
       }
     }
   }

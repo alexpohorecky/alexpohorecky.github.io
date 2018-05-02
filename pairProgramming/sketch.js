@@ -3,6 +3,8 @@ let cannon;
 let mouseXPos;
 let balls = [];
 let ballLaunchPos;
+
+let pegs = [];
 function preload(){
   backgroundGraphic = loadImage('peggleBaseScreen.png');
   cannon = loadImage('peggleCannon.png');
@@ -16,13 +18,17 @@ function setup(){
 
   image(backgroundGraphic,0,0, width, height);
 
-
+  pegs.push(new Peg(width/2, height/2, height/50));
 
 }
 
 function draw(){
   imageMode(CORNER);
   image(backgroundGraphic,0,0, width, height);
+
+  for (let peg of pegs){
+    peg.show();
+  }
 
   fill("green");
   strokeWeight(5);
@@ -39,8 +45,10 @@ function draw(){
 
   pop();
   for (let ball of balls){
+    ball.checkPegCollision(pegs);
     ball.move();
     ball.animate();
+
   }
   // rectMode(CENTER);
   // rect(0,0,20,60);
