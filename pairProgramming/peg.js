@@ -13,6 +13,7 @@ class Peg{
     else{
       fill("Red");
     }
+    noStroke();
     ellipse(this.x, this.y, this.r);
   }
 }

@@ -10,7 +10,7 @@ class Ball {
     this.pos = createVector(this.x, this.y);
     this.vel = createVector(xVelocity, yVelocity);
     this.accel = createVector(xAcceleration, yAcceleration);
-    this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
+    //this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   }
   move() {
     // Velocity affects position
@@ -34,7 +34,7 @@ class Ball {
   }
   checkPegCollision(pegArray){
     for (let peg of pegArray){
-      if (dist(this.x, this.y, peg.x, peg.y) < (this.r + peg.r)){
+      if (dist(this.x, this.y, peg.x, peg.y-height/2) < (this.r + peg.r)){
         // bounce(peg);
         peg.hit = true;
       }
