@@ -29,7 +29,9 @@ function draw(){
   image(backgroundGraphic,-width/2,0, width, height);
 
   for (let peg of pegs){
-    peg.show();
+    if (!peg.hit){
+      peg.show();
+    }
   }
 
   fill("green");
@@ -38,18 +40,21 @@ function draw(){
 
   ballLaunchPos = createVector(0,height/15);
   angleMode(DEGREES);
-  //push();
-  // rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
-  // ballLaunchPos.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
+  push();
+  rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
+  ballLaunchPos.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   imageMode(CENTER);
   image(cannon,0,height/56,height/6,height/10);
-  //pop();
+  pop();
   for (let ball of balls){
-    ball.checkPegCollision(pegs);
+
     if (!interupt){
     ball.move();
     }
-    ball.animate();
+    ball.checkPegCollision(pegs);
+    if (!ball.collided){
+      ball.animate();
+    }
 
   }
   // rectMode(CENTER);
@@ -57,7 +62,7 @@ function draw(){
 }
 
 function mouseClicked(){
-    balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,height/50,0,5,0,0,0,0,0));
+    balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,height/50,0,8,0,0,0,0,0));
 }
 function keyPressed(){
   if (keyCode === 32){

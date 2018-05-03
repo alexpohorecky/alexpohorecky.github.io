@@ -7,10 +7,12 @@ class Ball {
     this.clrG = _clrG;
     this.clrB = _clrB;
 
+    this.collided = false;
+
     this.pos = createVector(this.x, this.y);
     this.vel = createVector(xVelocity, yVelocity);
     this.accel = createVector(xAcceleration, yAcceleration);
-    //this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
+    this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   }
   move() {
     // Velocity affects position
@@ -18,28 +20,16 @@ class Ball {
     // Acceleration affects velocity
     this.vel.add(this.accel);
   }
-  bounce(collidedPeg){
-    this.normalVector = createVector(this.x - collidedPeg.x, this.y - collidedPeg.y);
-    this.unitNormalVector = this.normalVector.normalize();
-    this.unitTangentVector = createVector(-1*this.unitNormalVector.y, -1*this.unitNormalVector.x);
-    this.normalVelocityScalar = dot(this.velocity, this.unitNormalVector);
-    this.tangentVelocityScalar = dot(this.velocity, this.unitTangentVector);
-    this.normalVelocityScalar.mult(0);
-    this.normalVelocityScalarVector = this.normalVelocityScalar.mult(this.unitNormalVector);
-    this.tangentVelocityScalarVector = this.tangentVelocityScalar.mult(this.unitTangentVector);
 
-    this.velocity = this.normalVelocityScalarVector.add(this.tangentVelocityScalarVector);
-    collidedPeg.hit = true;
-
-  }
   checkPegCollision(pegArray){
     for (let peg of pegArray){
-      if (dist(this.x, this.y, peg.x, peg.y-height/2) < (this.r + peg.r)){
-        // bounce(peg);
+      if (dist(this.pos.x, this.pos.y, peg.x, peg.y) < (this.r + peg.r)){
         peg.hit = true;
+        this.collided = true;
       }
     }
   }
+
 
   animate() {
     fill(this.clrR, this.clrG, this.clrB);
