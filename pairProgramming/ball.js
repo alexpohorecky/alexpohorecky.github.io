@@ -15,6 +15,11 @@ class Ball {
     this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   }
   move() {
+    if (this.pos.x > width || this.pos.x < width) {
+      // Ball bounces
+      this.vel.x *= -1;
+
+    }
     // Velocity affects position
     this.pos.add(this.vel);
     // Acceleration affects velocity

@@ -15,7 +15,7 @@ function preload(){
 function setup(){
   createCanvas(windowWidth, windowHeight);
   document.documentElement.style.overflow = 'hidden';
-  document.body.style.cursor = 'none';
+  //document.body.style.cursor = 'none';
 
   translate(width/2, 0);
 
@@ -49,6 +49,9 @@ function draw(){
   for (let ball of balls){
 
     if (!interupt){
+    if (ball.pos.x <= width/3.9){
+      ball.vel.x *= -1;
+    }
     ball.move();
     }
     ball.checkPegCollision(pegs);
@@ -63,6 +66,7 @@ function draw(){
 
 function mouseClicked(){
     balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,height/50,0,8,0,0,0,0,0));
+    console.log(mouseX);
 }
 function keyPressed(){
   if (keyCode === 32){
