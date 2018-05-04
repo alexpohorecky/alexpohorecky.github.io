@@ -29,9 +29,7 @@ function draw(){
   image(backgroundGraphic,-width/2,0, width, height);
 
   for (let peg of pegs){
-    if (!peg.hit){
       peg.show();
-    }
   }
 
   fill("green");
@@ -49,14 +47,13 @@ function draw(){
   for (let ball of balls){
 
     if (!interupt){
-    if (ball.pos.x <= width/3.9){
-      ball.vel.x *= -1;
-    }
     ball.move();
     }
+    ball.animate();
     ball.checkPegCollision(pegs);
-    if (!ball.collided){
-      ball.animate();
+    if (ball.collided){
+      balls.splice(0);
+      pegs.splice(0);
     }
 
   }

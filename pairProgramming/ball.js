@@ -15,7 +15,7 @@ class Ball {
     this.vel.rotate(map(constrain(mouseX,width/16,width/3), width/3, width/16, -90, 90));
   }
   move() {
-    if (this.pos.x > width || this.pos.x < width) {
+    if (this.pos.x < -1 * width/3.9 + this.r/2 || this.pos.x > width/3.9 - this.r/2) {
       // Ball bounces
       this.vel.x *= -1;
 
@@ -29,7 +29,13 @@ class Ball {
   checkPegCollision(pegArray){
     for (let peg of pegArray){
       if (dist(this.pos.x, this.pos.y, peg.x, peg.y) < (this.r + peg.r)){
-        peg.hit = true;
+        if (!peg.hit){
+          peg.hit = true;
+        }
+        else{
+          pegArray.splice(pegArray.indexOf(peg),1);
+
+        }
         this.collided = true;
       }
     }
