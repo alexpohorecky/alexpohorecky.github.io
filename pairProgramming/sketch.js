@@ -5,6 +5,7 @@ let balls = [];
 let ballLaunchPos;
 let interupt = false;
 
+
 let pegs = [];
 function preload(){
   backgroundGraphic = loadImage('peggleBaseScreen.png');
@@ -15,11 +16,9 @@ function preload(){
 function setup(){
   createCanvas(windowWidth, windowHeight);
   document.documentElement.style.overflow = 'hidden';
-  //document.body.style.cursor = 'none';
+  document.body.style.cursor = 'none';
 
-  translate(width/2, 0);
-
-  pegs.push(new Peg(0, height/2, height/50));
+  pegs.push(new Peg(0,height/2 , height/50));
 
 }
 
@@ -30,9 +29,11 @@ function draw(){
 
   for (let peg of pegs){
       peg.show();
+      if (peg.hit){
+        pegs.splice(pegs.indexOf(peg), 1);
+      }
   }
 
-  fill("green");
   strokeWeight(5);
 
 
@@ -52,14 +53,12 @@ function draw(){
     ball.animate();
     ball.checkPegCollision(pegs);
     if (ball.collided){
-      balls.splice(0);
-      pegs.splice(0);
+      balls.splice(balls.indexOf(ball),1);
     }
 
   }
-  // rectMode(CENTER);
-  // rect(0,0,20,60);
 }
+
 
 function mouseClicked(){
     balls.push(new Ball(ballLaunchPos.x,ballLaunchPos.y,height/50,0,8,0,0,0,0,0));
