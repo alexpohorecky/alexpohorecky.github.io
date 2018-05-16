@@ -1,52 +1,61 @@
 
-
+let p;
+let numOfPoints = 2000;
 function setup(){
-
+  p = new Perceptron(3);
+  for (let i = 0; i < numOfPoints; i++)
 }
 
 function draw(){
 
 }
 
-class Perceptron {
+function f(x){
+  return 2*x+1;
+}
+function findAnswer(line, yCoord){
+  if (yCoord < line){
+    return -1;
+  }
+  else{
+    return 1;
+  }
+}
+class Perceptron{
   constructor(numOfWeights){
+    this.n = numOfWeights;
     this.weights = [];
-    this.c = 0.01;
-    for (let i = 0; i < numOfWeights; i++){
+    this.learningConstant = 0.01;
+    for (let i = 0; i < this.n; i++){
       this.weights.push(random(-1,1));
     }
 
   }
-  this.feedForward(inputs){
-    this.sum = 0;
-    for (let i = 0; i < inputs.length; i++){
-      this.sum += inputs[i]*this.weights[i];
-
+  throughput(inputs){
+    this.sum = 0
+    for (let i = 0; i < this.n; i++){
+      this.sum += inputs[i] * this.weights[i];
     }
     return this.activate(this.sum);
-
   }
-  this.activate(sum){
+
+  activate(sum){
     return sum/abs(sum);
   }
 
-  this.train(inputs, answer){
-    this.guess = feedForward(inputs);
-    this.error = answer - this.guess;
-
-    for (let i = 0; i < numOfWeights; i++){
-      weights[i]+= c * error * inputs[i];
+  train(input, answer){
+    this.attempt = this.throughput(input);
+    this.error = answer - this.attempt;
+    for (let i = 0; i < this.n; i++){
+      this.weights[i] += this.learningConstant * this.error * input[i];
     }
   }
 }
 
-class Trainer {
-  constructor(x, y, a){
+class Trainer{
+  constructor(x,y,a){
     this.inputs = [x,y,1];
     this.answer = a;
-  }
 
-  this.f(x){
-    return 2*x+1
   }
 }
