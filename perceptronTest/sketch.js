@@ -1,13 +1,43 @@
 
 let p;
-let numOfPoints = 2000;
+let numOfPoints = 20000;
+let training = [];
+let lastTime;
+let waitTime = 1;
 function setup(){
+  createCanvas(windowWidth, windowHeight);
   p = new Perceptron(3);
-  for (let i = 0; i < numOfPoints; i++)
+  for (let i = 0; i < numOfPoints; i++){
+    let x = random(-width/2, width/2);
+    let y = random(-height/2, height/2);
+    let a = findAnswer(f(x),y);
+    training.push(new Trainer(x, y, a));
+  }
+  //lastTime = millis();
 }
 
 function draw(){
-
+  background(255);
+  translate(width/2, height/2);
+  for (let x = -width/2; x < width/2; x++){
+    stroke(255,0,0);
+    point(x,f(x));
+  }
+  for(let trainer of training){
+    //if (millis() - lastTime >= waitTime){
+      stroke(0);
+      p.train(trainer.inputs, trainer.answer);
+      let guess = p.throughput(trainer.inputs);
+      if (guess > 0){
+        noFill();
+      }
+      else{
+        fill(0);
+      }
+      ellipse(trainer.inputs[0], trainer.inputs[1], 10);
+      //lastTime = millis();
+    //}
+  }
 }
 
 function f(x){
@@ -25,7 +55,7 @@ class Perceptron{
   constructor(numOfWeights){
     this.n = numOfWeights;
     this.weights = [];
-    this.learningConstant = 0.01;
+    this.learningConstant = 0.00000010;
     for (let i = 0; i < this.n; i++){
       this.weights.push(random(-1,1));
     }
