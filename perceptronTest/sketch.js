@@ -21,7 +21,7 @@ function draw(){
   translate(width/2, height/2);
   for (let x = -width/2; x < width/2; x++){
     stroke(255,0,0);
-    point(x,f(x));
+    line(x,f(x), x-1, f(x-1));
   }
   for(let trainer of training){
     //if (millis() - lastTime >= waitTime){
@@ -41,7 +41,7 @@ function draw(){
 }
 
 function f(x){
-  return 2*x+1;
+  return 0.02*sq(x)+1;
 }
 function findAnswer(line, yCoord){
   if (yCoord < line){
