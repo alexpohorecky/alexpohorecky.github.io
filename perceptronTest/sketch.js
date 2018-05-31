@@ -41,7 +41,7 @@ function draw(){
 }
 
 function f(x){
-  return 0.02*sq(x)+1;
+  return 2*x+1;
 }
 function findAnswer(line, yCoord){
   if (yCoord < line){
