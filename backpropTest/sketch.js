@@ -9,6 +9,7 @@ function setup(){
   createCanvas(windowWidth, windowHeight);
   network = new Network([2,2,1]);
   network.addNodes();
+  network.createWeights();
 }
 
 function draw(){
@@ -31,6 +32,15 @@ class Network{
     }
   }
   createWeights(){
+    for (let layer = 0; layer < this.networkMatrix.length - 1; layer++){
+      for (let node = 0; node < this.networkMatrix[layer].length; node++){
+        for (let nextLayerNode = 0; nextLayerNode < this.networkMatrix[layer+1].length; nextLayerNode++){
+          this.networkMatrix[layer][node].weights.push(random(-1,1));
+        }
+      }
+    }
+  }
+  feedForward(a,b){
     
   }
 }
