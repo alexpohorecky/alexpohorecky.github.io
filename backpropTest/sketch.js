@@ -10,10 +10,15 @@ function setup(){
   network = new Network([2,2,1]);
   network.addNodes();
   network.createWeights();
+  network.feedForward(1,0);
 }
 
 function draw(){
 
+}
+
+function activate(x){
+    return 1/(1+exp(-1*x));
 }
 
 class Network{
@@ -41,7 +46,17 @@ class Network{
     }
   }
   feedForward(a,b){
-    
+    this.networkMatrix[0][0].activation = activate(a+this.networkMatrix[0][0].bias);
+    this.networkMatrix[0][1].activation = activate(b+this.networkMatrix[0][1].bias);
+
+    for (let layer = 0; layer < this.networkMatrix.length - 1; layer++){
+      for (let node = 0; node < this.networkMatrix[layer].length; node++){
+        for (let nextLayerNode = 0; nextLayerNode < this.networkMatrix[layer+1].length; nextLayerNode++){
+          this.networkMatrix[layer+1][nextLayerNode].activation += activate(this.networkMatrix[layer][node].activation * this.networkMatrix[layer][node].weights[nextLayerNode] + this.networkMatrix[layer+1][nextLayerNode].bias);
+
+        }
+      }
+    }
   }
 }
 
@@ -49,6 +64,7 @@ class Node{
   constructor(){
     this.weights = [];
     this.bias = random(-1,1);
-    this.activation;
+    this.activation = 0;
   }
+
 }
