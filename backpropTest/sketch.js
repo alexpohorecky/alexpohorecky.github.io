@@ -10,7 +10,6 @@ function setup(){
   createCanvas(windowWidth, windowHeight);
   network = new Network([2,2,1]);
   network.addNodes();
-  network.createWeights();
   network.feedForward(1,0);
 }
 
@@ -22,6 +21,21 @@ function activate(x){
     return 1/(1+exp(-1*x));
 }
 
+function outputError (outputActivations, answers, outputWeightedSums){}
+
+class Trainer{
+  constructor(examples){
+    this.answers = [];
+    for (let example of examples){
+      if (example[0] && !example[1] || !example[0] && example[1]){
+        this.answers.push(1);
+      }
+      else{
+        this.answers.push(0);
+      }
+    }
+  }
+}
 class Network{
   constructor(_networkOutline){
     this.networkOutline = _networkOutline;
@@ -37,15 +51,7 @@ class Network{
       this.networkMatrix.push(layer)
     }
   }
-  createWeights(){
-    for (let layer = 0; layer < this.networkMatrix.length - 1; layer++){
-      for (let node = 0; node < this.networkMatrix[layer].length; node++){
-        for (let nextLayerNode = 0; nextLayerNode < this.networkMatrix[layer+1].length; nextLayerNode++){
-          this.networkMatrix[layer][node].weights.push(random(-1,1));
-        }
-      }
-    }
-  }
+
   feedForward(a,b){
     this.networkMatrix[0][0].activation = activate(a+this.networkMatrix[0][0].bias);
     this.networkMatrix[0][1].activation = activate(b+this.networkMatrix[0][1].bias);
@@ -62,8 +68,11 @@ class Network{
 }
 
 class Node{
-  constructor(){
+  constructor(numOfInputs){
     this.weights = [];
+    for (let i = 0; i < numOfInputs; i++){
+      this.weights.push(random(-1,1));
+    }
     this.bias = random(-1,1);
     this.activation = 0;
   }
