@@ -10,6 +10,7 @@ function setup(){
   createCanvas(windowWidth, windowHeight);
   network = new Network([2,2,1]);
   network.addNodes();
+  network.generateWeights();
   network.feedForward(1,0);
 }
 
@@ -51,28 +52,40 @@ class Network{
       this.networkMatrix.push(layer)
     }
   }
+  generateWeights(){
+    for (let layer = 0; layer < this.networkOutline.length; layer++){
+      for (let node = 0; node < this.networkOutline[layer]; node++){
+        for (let nextLayerNode = 0; nextLayerNode < this.networkOutline[layer+1]; nextLayerNode++){
+          this.networkMatrix[layer+1][nextLayerNode].weights.push(random(-1,1));
+        }
+      }
+    }
+  }
 
   feedForward(a,b){
     this.networkMatrix[0][0].activation = activate(a+this.networkMatrix[0][0].bias);
     this.networkMatrix[0][1].activation = activate(b+this.networkMatrix[0][1].bias);
 
-    for (let layer = 0; layer < this.networkMatrix.length - 1; layer++){
+
+    for (let layer = 1; layer < this.networkMatrix.length; layer++){
       for (let node = 0; node < this.networkMatrix[layer].length; node++){
-        for (let nextLayerNode = 0; nextLayerNode < this.networkMatrix[layer+1].length; nextLayerNode++){
-          this.networkMatrix[layer+1][nextLayerNode].activation += activate(this.networkMatrix[layer][node].activation * this.networkMatrix[layer][node].weights[nextLayerNode] + this.networkMatrix[layer+1][nextLayerNode].bias);
+        for (let previousLayerNode = 0; previousLayerNode < this.networkMatrix[layer-1].length; previousLayerNode++){
+          this.networkMatrix[layer][node].weightedSum += this.networkMatrix[layer-1][previousLayerNode].activation * this.networkMatrix[layer][node].weights[previousLayerNode];
 
         }
+        this.networkMatrix[layer][node].activation = activate(this.networkMatrix[layer][node].weightedSum + this.networkMatrix[layer][node].bias);
       }
     }
   }
 }
 
 class Node{
-  constructor(numOfInputs){
+  constructor(/*numOfInputs*/){
     this.weights = [];
-    for (let i = 0; i < numOfInputs; i++){
-      this.weights.push(random(-1,1));
-    }
+    this.weightedSum = 0;
+    // for (let i = 0; i < numOfInputs; i++){
+    //   this.weights.push(random(-1,1));
+    // }
     this.bias = random(-1,1);
     this.activation = 0;
   }
