@@ -18,11 +18,21 @@ function draw(){
 
 }
 
-function activate(x){
+function sigmoid(x){
     return 1/(1+exp(-1*x));
 }
 
-function outputError (outputActivations, answers, outputWeightedSums){}
+function dSigmoid(x){
+  return sigmoid(x)*(1-sigmoid(x));
+}
+
+function cost(outputActivation, answer){
+  return 0.5*sq(answer - outputActivation);
+}
+
+function outputError(outputActivation, answer, weightedSum){
+  return((answer-outputActivation)*dSigmoid(weightedSum));
+}
 
 class Trainer{
   constructor(examples){
@@ -63,8 +73,8 @@ class Network{
   }
 
   feedForward(a,b){
-    this.networkMatrix[0][0].activation = activate(a+this.networkMatrix[0][0].bias);
-    this.networkMatrix[0][1].activation = activate(b+this.networkMatrix[0][1].bias);
+    this.networkMatrix[0][0].activation = sigmoid(a+this.networkMatrix[0][0].bias);
+    this.networkMatrix[0][1].activation = sigmoid(b+this.networkMatrix[0][1].bias);
 
 
     for (let layer = 1; layer < this.networkMatrix.length; layer++){
@@ -73,7 +83,7 @@ class Network{
           this.networkMatrix[layer][node].weightedSum += this.networkMatrix[layer-1][previousLayerNode].activation * this.networkMatrix[layer][node].weights[previousLayerNode];
 
         }
-        this.networkMatrix[layer][node].activation = activate(this.networkMatrix[layer][node].weightedSum + this.networkMatrix[layer][node].bias);
+        this.networkMatrix[layer][node].activation = sigmoid(this.networkMatrix[layer][node].weightedSum + this.networkMatrix[layer][node].bias);
       }
     }
   }
