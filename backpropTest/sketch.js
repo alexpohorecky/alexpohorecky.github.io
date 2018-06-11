@@ -3,15 +3,15 @@ Date Created: May 29, 2018
 First Crack At Back Propagation
 Gonna Try solving the XOR problem
 Time to see if I know what I'm doing...
-Despacito
 */
-
+let examples = [[1,0]];
 function setup(){
   createCanvas(windowWidth, windowHeight);
-  network = new Network([2,2,1]);
+  trainer = new Trainer(examples);
+  network = new Network([2,2,1], trainer.answers);
   network.addNodes();
   network.generateWeights();
-  network.feedForward(1,0);
+  network.feedForward(examples[0][0],examples[0][1]);
 }
 
 function draw(){
@@ -34,6 +34,10 @@ function outputError(outputActivation, answer, weightedSum){
   return((answer-outputActivation)*dSigmoid(weightedSum));
 }
 
+
+
+
+}
 class Trainer{
   constructor(examples){
     this.answers = [];
@@ -48,7 +52,7 @@ class Trainer{
   }
 }
 class Network{
-  constructor(_networkOutline){
+  constructor(_networkOutline, answers){
     this.networkOutline = _networkOutline;
     this.networkMatrix = [];
 
@@ -87,6 +91,25 @@ class Network{
       }
     }
   }
+
+
+
+  shiftBackError(){
+    this.networkMatrix[this.networkMatrix.length-1][0].error = outputError(this.networkMatrix[this.networkMatrix.length-1][0].activation, answers[0], this.networkMatrix[this.networkMatrix.length-1][0].weightedSum);
+    let weightMatrix = [];
+    let errorVector = [];
+    let weightedSumVector = [];
+    for (let node = 0; node < this.networkMatrix[layerIndex+1].length; node++){
+      let nodeWeights = [];
+      for (let weight = 0; weight < this.networkMatrix[layerIndex+1][node].weights.length; weight++){
+        nodeWeights.push(this.networkMatrix[layerIndex+1][node].weights[weight]);
+      }
+      weightMatrix.push(nodeWeights);
+    }
+
+  }
+
+
 }
 
 class Node{
@@ -98,6 +121,9 @@ class Node{
     // }
     this.bias = random(-1,1);
     this.activation = 0;
+
+    this.error;
+
   }
 
 }
