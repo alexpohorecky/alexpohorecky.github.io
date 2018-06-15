@@ -8,16 +8,13 @@ Resources Used:
 "Neural Networks" Youtube Series by 3Blue1Brown
 "Neural Networks and Deep Learning" by Michael Nielsen
 */
-let inputs = [];
-let numOfInputs = 1000;
+
 let net;
 function setup(){
-  for (let i = 0; i < numOfInputs; i++){
-    inputs.push(floor(random(-1000,1000)));
-  }
-  let netInput = networkInputPrepper(inputs);
+  createCanvas(28,28);
+  background(0);
   net = new Network([1,2,1]);
-  net.stochGradientDesc(netInput, 10, 10,1.0);
+  net.applyMiniBatch([[2,4],[3,9],[4,16],[5,25]],1);
 }
 function draw(){
 
@@ -27,13 +24,21 @@ function sigmoidDerivative(x){
   return nj.sigmoid(x).multiply(nj.sigmoid(x).multiply(-1).add(1));
 }
 
-function networkInputPrepper(desiredInputs){
-  let output = [];
-  for (let input of desiredInputs){
-    output.push([input, sq(input)]);
+function matrixMultVectors(ndColumnVector,ndRowVector){
+  //Receive to NDArray Vectors, and return the matrix product of them.
+  let matrixProduct = [];
+  let columnVector = ndColumnVector.tolist();
+  let rowVector = ndRowVector.tolist();
+  for (let columnElement of columnVector){
+    let row = [];
+    for (let rowElement of rowVector){
+      row.push(columnElement*rowElement);
+    }
+    matrixProduct.push(row);
   }
-  return output;
+  return nj.array(matrixProduct);
 }
+
 
 
 class Network{
@@ -82,10 +87,9 @@ class Network{
     let deltaBiasGradient = [];
     for (let layer = 0; layer < this.numOfLayers-1; layer++){
       deltaWeightGradient.push(nj.zeros(this.weights[layer].shape));
+      deltaBiasGradient.push(nj.zeros(this.biases[layer].shape));
     }
-    for (let layer = 1; layer < this.numOfLayers; layer++){
-      deltaBiasGradient.push(nj.zeros(this.biases[layer-1].shape));
-    }
+
 
     // Feeding forward, except the activations and weighted sums are kept track of for the purpose of backpropagation.
     let activation = inputs;
@@ -101,14 +105,15 @@ class Network{
     let error = this.costDerivative(activations[activations.length-1], answer).multiply(sigmoidDerivative(weightedSums[weightedSums.length-1]));
 
     deltaBiasGradient[deltaBiasGradient.length-1] = error;
-    deltaWeightGradient[deltaWeightGradient.length-1] = nj.dot(error, activations[activations.length-2].T);
+    deltaWeightGradient[deltaWeightGradient.length-1] = matrixMultVectors(error, activations[activations.length-2]);
+
 
     //Propagate the error back through the layers.
-    for (let layer = this.numOfLayers-2; layer > 0; layer--){
+    for (let layer = this.numOfLayers-2; layer = 0; layer--){
       let weightedSum = weightedSums[layer];
       error = nj.dot(this.weights[layer+1].T, error).multiply(sigmoidDerivative(weightedSum));
       deltaBiasGradient[layer] = error;
-      deltaWeightGradient[layer] = nj.dot(error, activations[layer-1].T);
+      deltaWeightGradient[layer] = matrixMultVectors(error, activations[layer-1]);
     }
     return [deltaWeightGradient, deltaBiasGradient];
   }
@@ -117,11 +122,11 @@ class Network{
     // Apply each test data in a mini-batch through the network, tweaking the weights and biases.
     let weightGradient = [];
     let biasGradient = [];
-    for (let layer = 0; layer < this.numOfLayers-1; layer++){
+    for (let layer = 0; layer < this.weights.length; layer++){
       weightGradient.push(nj.zeros(this.weights[layer].shape));
     }
-    for (let layer = 1; layer < this.numOfLayers; layer++){
-      biasGradient.push(nj.zeros(this.biases[layer-1].shape));
+    for (let layer = 0; layer < this.biases.length; layer++){
+      biasGradient.push(nj.zeros(this.biases[layer].shape));
     }
 
     for (let test of miniBatch){
@@ -131,13 +136,19 @@ class Network{
       let deltaWeightGradient = deltaGradients[0];
       let deltaBiasGradient = deltaGradients[1];
       // Update the gradients.
-      for (let layer = 0; layer < this.numOfLayers; layer++){
+      for (let layer = 0; layer < weightGradient.length; layer++){
+        console.log(weightGradient[layer].shape);
+        console.log(deltaWeightGradient[layer].shape);
         weightGradient[layer] = weightGradient[layer].add(deltaWeightGradient[layer]);
+      }
+      for (let layer = 0; layer < biasGradient.length; layer++){
         biasGradient[layer] = biasGradient[layer].add(deltaBiasGradient[layer]);
       }
       // Update the weights and biases.
-      for (let layer = 0; layer < this.numOfLayers; layer++){
+      for (let layer = 0; layer < this.weights.length; layer++){
         this.weights[layer] = this.weights[layer].subtract(weightGradient[layer].multiply(learningRate/miniBatch.length));
+      }
+      for (let layer = 0; layer < this.biases.length; layer++){
         this.biases[layer] = this.biases[layer].subtract(biasGradient[layer].multiply(learningRate/miniBatch.length));
       }
     }
