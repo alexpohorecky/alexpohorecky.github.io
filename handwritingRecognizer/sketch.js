@@ -11,13 +11,34 @@ Resources Used:
 
 let net;
 function setup(){
-  createCanvas(28,28);
-  background(0);
-  net = new Network([1,2,1]);
-  net.applyMiniBatch([[2,4],[3,9],[4,16],[5,25]],1);
+  net = new Network([784,30,10]);
+  net.stochGradientDesc(inputs, 10, 10, 3)
 }
 function draw(){
 
+}
+
+function retrievePixelValues(){
+  let dataFileBuffer  = fs.readFileSync('train-images-idx3-ubyte');
+  let labelFileBuffer = fs.readFileSync('train-labels-idx1-ubyte');
+  let pixelValues     = [];
+
+  // It would be nice with a checker instead of a hard coded 60000 limit here
+  for (let image = 0; image <= 59999; image++) {
+    let pixels = [];
+
+    for (let y = 0; y <= 27; y++) {
+        for (let x = 0; x <= 27; x++) {
+            pixels.push(dataFileBuffer[(image * 28 * 28) + (x + (y * 28)) + 16]);
+        }
+    }
+
+    let imageData  = {};
+    imageData[JSON.stringify(labelFileBuffer[image + 8])] = pixels;
+
+    pixelValues.push(imageData);
+  }
+  return pixelValues;
 }
 
 function sigmoidDerivative(x){
@@ -75,7 +96,13 @@ class Network{
     for (let layer = 0; layer < this.numOfLayers-1; layer++){
       a = nj.sigmoid(nj.dot(this.weights[layer].T, a).add(this.biases[layer],false));
     }
-    return a;
+    let highestOutput = 0;
+    for (let node = 0; node < a.tolist().length; node++){
+      if (a.tolist()[node] > highestOutput){
+        highestOutput = a.tolist()[node];
+      }
+    }
+    return highestOutput;
   }
 
   costDerivative(outputs, answer){
@@ -123,6 +150,7 @@ class Network{
     let weightGradient = [];
     let biasGradient = [];
     for (let layer = 0; layer < this.weights.length; layer++){
+      //console.log(this.weights[layer].shape);
       weightGradient.push(nj.zeros(this.weights[layer].shape));
     }
     for (let layer = 0; layer < this.biases.length; layer++){
@@ -137,9 +165,8 @@ class Network{
       let deltaBiasGradient = deltaGradients[1];
       // Update the gradients.
       for (let layer = 0; layer < weightGradient.length; layer++){
-        console.log(weightGradient[layer].shape);
-        console.log(deltaWeightGradient[layer].shape);
-        weightGradient[layer] = weightGradient[layer].add(deltaWeightGradient[layer]);
+        // Bodge fix for adding two arrays of different shape... keep eye on it...
+        weightGradient[layer] = weightGradient[layer].add(deltaWeightGradient[layer].reshape(weightGradient[layer].shape));
       }
       for (let layer = 0; layer < biasGradient.length; layer++){
         biasGradient[layer] = biasGradient[layer].add(deltaBiasGradient[layer]);
@@ -169,6 +196,11 @@ class Network{
         this.applyMiniBatch(miniBatch, learningConstant);
       }
     }
+  }
+
+  evaluate(testData){
+    // Feeds test data through network and returns how many it guessed correctly.
+
   }
 
 
