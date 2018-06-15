@@ -9,12 +9,15 @@ Resources Used:
 "Neural Networks and Deep Learning" by Michael Nielsen
 */
 let inputs = [];
+let numOfInputs = 1000;
 let net;
 function setup(){
-  for (let i = 0; i < 784; i++){
-    inputs.push(random(0,1));
+  for (let i = 0; i < numOfInputs; i++){
+    inputs.push(floor(random(-1000,1000)));
   }
+  let netInput = networkInputPrepper(inputs);
   net = new Network([1,2,1]);
+  net.stochGradientDesc(netInput, 10, 10,1.0);
 }
 function draw(){
 
@@ -24,6 +27,13 @@ function sigmoidDerivative(x){
   return nj.sigmoid(x).multiply(nj.sigmoid(x).multiply(-1).add(1));
 }
 
+function networkInputPrepper(desiredInputs){
+  let output = [];
+  for (let input of desiredInputs){
+    output.push([input, sq(input)]);
+  }
+  return output;
+}
 
 
 class Network{
@@ -70,9 +80,11 @@ class Network{
   backpropagate(inputs, answer){
     let deltaWeightGradient = [];
     let deltaBiasGradient = [];
-    for (let layer = 0; layer < this.numOfLayers; layer++){
-      weightGradient.push(nj.zeros(this.weights[layer].shape));
-      biasGradient.push(nj.zeros(this.biases[layer].shape));
+    for (let layer = 0; layer < this.numOfLayers-1; layer++){
+      deltaWeightGradient.push(nj.zeros(this.weights[layer].shape));
+    }
+    for (let layer = 1; layer < this.numOfLayers; layer++){
+      deltaBiasGradient.push(nj.zeros(this.biases[layer-1].shape));
     }
 
     // Feeding forward, except the activations and weighted sums are kept track of for the purpose of backpropagation.
@@ -80,13 +92,13 @@ class Network{
     let activations = [inputs];
     let weightedSums = [];
     for (let layer = 0; layer < this.numOfLayers-1; layer++){
-      let weightedSum = nj.dot(this.weights[layer].T, activation).add(this.baises[layer],false);
+      let weightedSum = nj.dot(this.weights[layer].T, activation).add(this.biases[layer],false);
       weightedSums.push(weightedSum);
       activation = nj.sigmoid(weightedSum);
       activations.push(activation);
     }
     // Determine the error in the output layer.
-    let error = costDerivative(activations[activations.length-1], answer).multiply(sigmoidDerivative(weightedSums[weightedSums.length-1]));
+    let error = this.costDerivative(activations[activations.length-1], answer).multiply(sigmoidDerivative(weightedSums[weightedSums.length-1]));
 
     deltaBiasGradient[deltaBiasGradient.length-1] = error;
     deltaWeightGradient[deltaWeightGradient.length-1] = nj.dot(error, activations[activations.length-2].T);
@@ -105,20 +117,45 @@ class Network{
     // Apply each test data in a mini-batch through the network, tweaking the weights and biases.
     let weightGradient = [];
     let biasGradient = [];
-    for (let layer = 0; layer < this.numOfLayers; layer++){
+    for (let layer = 0; layer < this.numOfLayers-1; layer++){
       weightGradient.push(nj.zeros(this.weights[layer].shape));
-      biasGradient.push(nj.zeros(this.biases[layer].shape));
+    }
+    for (let layer = 1; layer < this.numOfLayers; layer++){
+      biasGradient.push(nj.zeros(this.biases[layer-1].shape));
     }
 
     for (let test of miniBatch){
       let inputs = test[0];
       let answer = test[1];
-      let deltaGradients = backpropagate(inputs, answer);
+      let deltaGradients = this.backpropagate(inputs, answer);
       let deltaWeightGradient = deltaGradients[0];
       let deltaBiasGradient = deltaGradients[1];
+      // Update the gradients.
       for (let layer = 0; layer < this.numOfLayers; layer++){
-        weightGradient[layer] = weightGradient[layer].add(backpropagate(test[0],test[1])[0]);
-        biasGradient[layer] = biasGradient[layer].add(backpropagate())
+        weightGradient[layer] = weightGradient[layer].add(deltaWeightGradient[layer]);
+        biasGradient[layer] = biasGradient[layer].add(deltaBiasGradient[layer]);
+      }
+      // Update the weights and biases.
+      for (let layer = 0; layer < this.numOfLayers; layer++){
+        this.weights[layer] = this.weights[layer].subtract(weightGradient[layer].multiply(learningRate/miniBatch.length));
+        this.biases[layer] = this.biases[layer].subtract(biasGradient[layer].multiply(learningRate/miniBatch.length));
+      }
+    }
+  }
+
+  stochGradientDesc(_trainingData, numOfEpochs, miniBatchSize, learningConstant){
+    // Use stochastic gradient descent to train the network.
+    let numOfExamples = _trainingData.length;
+    let trainingData = _trainingData
+    for (let epoch = 0; epoch < numOfEpochs; epoch++){
+      trainingData = shuffle(trainingData);
+      let miniBatches = [];
+      // Create mini-batches.
+      for (let i = 0; i < numOfExamples/miniBatchSize; i++){
+        miniBatches.push(trainingData.slice(i,i+miniBatchSize));
+      }
+      for (let miniBatch of miniBatches){
+        this.applyMiniBatch(miniBatch, learningConstant);
       }
     }
   }
