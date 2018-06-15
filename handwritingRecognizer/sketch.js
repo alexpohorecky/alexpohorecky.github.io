@@ -9,36 +9,26 @@ Resources Used:
 "Neural Networks and Deep Learning" by Michael Nielsen
 */
 
+let netTrainingInputs = [];
+let netTestingInputs = [];
 let net;
 function setup(){
+  let startTime = millis();
+  let mnistData = mnist.set(60000,40000);
+  let trainingSet = mnistData.training;
+  let testSet = mnistData.test;
+  for (let i = 0; i < trainingSet.length; i++){
+    netTrainingInputs.push([trainingSet[i].input, trainingSet[i].output])
+  }
+  for (let i = 0; i < testSet.length; i++){
+    netTestingInputs.push([testSet[i].input, testSet[i].output])
+  }
   net = new Network([784,30,10]);
-  net.stochGradientDesc(inputs, 10, 10, 3)
+  net.stochGradientDesc(netTrainingInputs, 30, 10, 3.0);
+  console.log(millis()-startTime);
 }
 function draw(){
 
-}
-
-function retrievePixelValues(){
-  let dataFileBuffer  = fs.readFileSync('train-images-idx3-ubyte');
-  let labelFileBuffer = fs.readFileSync('train-labels-idx1-ubyte');
-  let pixelValues     = [];
-
-  // It would be nice with a checker instead of a hard coded 60000 limit here
-  for (let image = 0; image <= 59999; image++) {
-    let pixels = [];
-
-    for (let y = 0; y <= 27; y++) {
-        for (let x = 0; x <= 27; x++) {
-            pixels.push(dataFileBuffer[(image * 28 * 28) + (x + (y * 28)) + 16]);
-        }
-    }
-
-    let imageData  = {};
-    imageData[JSON.stringify(labelFileBuffer[image + 8])] = pixels;
-
-    pixelValues.push(imageData);
-  }
-  return pixelValues;
 }
 
 function sigmoidDerivative(x){
@@ -97,12 +87,14 @@ class Network{
       a = nj.sigmoid(nj.dot(this.weights[layer].T, a).add(this.biases[layer],false));
     }
     let highestOutput = 0;
+    let highestIndex;
     for (let node = 0; node < a.tolist().length; node++){
       if (a.tolist()[node] > highestOutput){
         highestOutput = a.tolist()[node];
+        highestIndex = node;
       }
     }
-    return highestOutput;
+    return highestIndex;
   }
 
   costDerivative(outputs, answer){
@@ -200,7 +192,23 @@ class Network{
 
   evaluate(testData){
     // Feeds test data through network and returns how many it guessed correctly.
-
+    let numOfTests = testData.length;
+    let numOfSuccesses = 0;
+    for (let test of testData){
+      let highestOutput = 0;
+      let highestIndex;
+      for (let node = 0; node < test[1].length; node++){
+        if (test[1][node] > highestOutput){
+          highestOutput = test[1][node];
+          highestIndex = node;
+        }
+      }
+      let testResult = this.feedforward(test[0]);
+      if (testResult === highestIndex){
+        numOfSuccesses++
+      }
+    }
+    return numOfSuccesses/numOfTests*100;
   }
 
 
