@@ -14,7 +14,7 @@ let netTestingInputs = [];
 let net;
 function setup(){
   let startTime = millis();
-  let mnistData = mnist.set(60000,40000);
+  let mnistData = mnist.set(6000,4000);
   let trainingSet = mnistData.training;
   let testSet = mnistData.test;
   for (let i = 0; i < trainingSet.length; i++){
@@ -195,11 +195,12 @@ class Network{
     let numOfTests = testData.length;
     let numOfSuccesses = 0;
     for (let test of testData){
+      let testOutput = test[1];
       let highestOutput = 0;
       let highestIndex;
-      for (let node = 0; node < test[1].length; node++){
-        if (test[1][node] > highestOutput){
-          highestOutput = test[1][node];
+      for (let node = 0; node < testOutput.length; node++){
+        if (testOutput[node] > highestOutput){
+          highestOutput = testOutput[node];
           highestIndex = node;
         }
       }
@@ -207,8 +208,9 @@ class Network{
       if (testResult === highestIndex){
         numOfSuccesses++
       }
-    }
-    return numOfSuccesses/numOfTests*100;
+     }
+     return numOfSuccesses/numOfTests;
+
   }
 
 
