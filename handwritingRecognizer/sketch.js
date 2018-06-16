@@ -1,8 +1,21 @@
 /*
 ALex Pohorecky
+June 15,2018
 
 Given the greyscale values of a 28x28 pixel image of a handwritten number,
 the network will guess what number was written.
+
+With the current number of training and test inputs, it takes approximately 6 minutes to "compile".
+
+With the hyper-parameters I have currently set up (hidden layer size, learning constant, epochs, minibatch size),
+the network has achieved a recorded success rate of around 11% (slightly better than the 10% probability of just randomly guessing a number).
+I believe this poor success rate can be attributed to an error in creating when applying the changes to each weight gradient in the Network.applyMiniBatch() function.
+
+Didn't have time to create a user interface that allows the user to input a single handwritten image by drawing it.
+To test a single 784 alpha-value, use the mnist.js library to create inputs and put them through the feed-through function.
+
+Numjs is the library I used for performing the linear algebra and other n-dimensional matrix operations.
+Mnist is the library I used to create the training and testing data.
 
 Resources Used:
 "Neural Networks" Youtube Series by 3Blue1Brown
@@ -12,8 +25,9 @@ Resources Used:
 let netTrainingInputs = [];
 let netTestingInputs = [];
 let net;
+
 function setup(){
-  let startTime = millis();
+  // Create the training and testing data sets.
   let mnistData = mnist.set(6000,4000);
   let trainingSet = mnistData.training;
   let testSet = mnistData.test;
@@ -23,20 +37,23 @@ function setup(){
   for (let i = 0; i < testSet.length; i++){
     netTestingInputs.push([testSet[i].input, testSet[i].output])
   }
+
+  // Create the network.
   net = new Network([784,30,10]);
+  // "Train" the network using stochastic gradient descent.
   net.stochGradientDesc(netTrainingInputs, 30, 10, 3.0);
-  console.log(millis()-startTime);
 }
 function draw(){
 
 }
 
 function sigmoidDerivative(x){
+  // Derivative of the sigmoid function.
   return nj.sigmoid(x).multiply(nj.sigmoid(x).multiply(-1).add(1));
 }
 
 function matrixMultVectors(ndColumnVector,ndRowVector){
-  //Receive to NDArray Vectors, and return the matrix product of them.
+  //Receive two NDArray Vectors, and return the matrix product of them. (Because for some reason numjs can't do this.)
   let matrixProduct = [];
   let columnVector = ndColumnVector.tolist();
   let rowVector = ndRowVector.tolist();
@@ -48,170 +65,4 @@ function matrixMultVectors(ndColumnVector,ndRowVector){
     matrixProduct.push(row);
   }
   return nj.array(matrixProduct);
-}
-
-
-
-class Network{
-  constructor(layerSizeArray){
-    this.numOfLayers = layerSizeArray.length;
-    this.layerSizes = layerSizeArray;
-    this.biases = [];
-    this.weights = [];
-    // Initializes the biases and weights in the network using a Standard Normal Distribution.
-    for (let layer = 1; layer < this.numOfLayers; layer++){
-      let layerBiases = [];
-      for(let node = 0; node < this.layerSizes[layer]; node++){
-        layerBiases.push(randomGaussian());
-      }
-      this.biases.push(nj.array(layerBiases));
-    }
-    for (let layer = 0; layer < this.numOfLayers-1; layer++){
-      let layerWeights = [];
-      for (let node = 0; node < this.layerSizes[layer]; node++){
-        let nodeWeights = [];
-        for(let weightsInNode = 0; weightsInNode < this.layerSizes[layer+1]; weightsInNode++){
-          nodeWeights.push(randomGaussian());
-        }
-        layerWeights.push(nodeWeights);
-      }
-      this.weights.push(nj.array(layerWeights));
-    }
-
-  }
-
-  feedforward(inputs){
-    // Feed the inputs through the network and return the activations of the output layer
-    let a = nj.array(inputs);
-    for (let layer = 0; layer < this.numOfLayers-1; layer++){
-      a = nj.sigmoid(nj.dot(this.weights[layer].T, a).add(this.biases[layer],false));
-    }
-    let highestOutput = 0;
-    let highestIndex;
-    for (let node = 0; node < a.tolist().length; node++){
-      if (a.tolist()[node] > highestOutput){
-        highestOutput = a.tolist()[node];
-        highestIndex = node;
-      }
-    }
-    return highestIndex;
-  }
-
-  costDerivative(outputs, answer){
-    return (outputs.subtract(answer));
-  }
-
-  backpropagate(inputs, answer){
-    let deltaWeightGradient = [];
-    let deltaBiasGradient = [];
-    for (let layer = 0; layer < this.numOfLayers-1; layer++){
-      deltaWeightGradient.push(nj.zeros(this.weights[layer].shape));
-      deltaBiasGradient.push(nj.zeros(this.biases[layer].shape));
-    }
-
-
-    // Feeding forward, except the activations and weighted sums are kept track of for the purpose of backpropagation.
-    let activation = inputs;
-    let activations = [inputs];
-    let weightedSums = [];
-    for (let layer = 0; layer < this.numOfLayers-1; layer++){
-      let weightedSum = nj.dot(this.weights[layer].T, activation).add(this.biases[layer],false);
-      weightedSums.push(weightedSum);
-      activation = nj.sigmoid(weightedSum);
-      activations.push(activation);
-    }
-    // Determine the error in the output layer.
-    let error = this.costDerivative(activations[activations.length-1], answer).multiply(sigmoidDerivative(weightedSums[weightedSums.length-1]));
-
-    deltaBiasGradient[deltaBiasGradient.length-1] = error;
-    deltaWeightGradient[deltaWeightGradient.length-1] = matrixMultVectors(error, activations[activations.length-2]);
-
-
-    //Propagate the error back through the layers.
-    for (let layer = this.numOfLayers-2; layer = 0; layer--){
-      let weightedSum = weightedSums[layer];
-      error = nj.dot(this.weights[layer+1].T, error).multiply(sigmoidDerivative(weightedSum));
-      deltaBiasGradient[layer] = error;
-      deltaWeightGradient[layer] = matrixMultVectors(error, activations[layer-1]);
-    }
-    return [deltaWeightGradient, deltaBiasGradient];
-  }
-
-  applyMiniBatch(miniBatch, learningRate){
-    // Apply each test data in a mini-batch through the network, tweaking the weights and biases.
-    let weightGradient = [];
-    let biasGradient = [];
-    for (let layer = 0; layer < this.weights.length; layer++){
-      //console.log(this.weights[layer].shape);
-      weightGradient.push(nj.zeros(this.weights[layer].shape));
-    }
-    for (let layer = 0; layer < this.biases.length; layer++){
-      biasGradient.push(nj.zeros(this.biases[layer].shape));
-    }
-
-    for (let test of miniBatch){
-      let inputs = test[0];
-      let answer = test[1];
-      let deltaGradients = this.backpropagate(inputs, answer);
-      let deltaWeightGradient = deltaGradients[0];
-      let deltaBiasGradient = deltaGradients[1];
-      // Update the gradients.
-      for (let layer = 0; layer < weightGradient.length; layer++){
-        // Bodge fix for adding two arrays of different shape... keep eye on it...
-        weightGradient[layer] = weightGradient[layer].add(deltaWeightGradient[layer].reshape(weightGradient[layer].shape));
-      }
-      for (let layer = 0; layer < biasGradient.length; layer++){
-        biasGradient[layer] = biasGradient[layer].add(deltaBiasGradient[layer]);
-      }
-      // Update the weights and biases.
-      for (let layer = 0; layer < this.weights.length; layer++){
-        this.weights[layer] = this.weights[layer].subtract(weightGradient[layer].multiply(learningRate/miniBatch.length));
-      }
-      for (let layer = 0; layer < this.biases.length; layer++){
-        this.biases[layer] = this.biases[layer].subtract(biasGradient[layer].multiply(learningRate/miniBatch.length));
-      }
-    }
-  }
-
-  stochGradientDesc(_trainingData, numOfEpochs, miniBatchSize, learningConstant){
-    // Use stochastic gradient descent to train the network.
-    let numOfExamples = _trainingData.length;
-    let trainingData = _trainingData
-    for (let epoch = 0; epoch < numOfEpochs; epoch++){
-      trainingData = shuffle(trainingData);
-      let miniBatches = [];
-      // Create mini-batches.
-      for (let i = 0; i < numOfExamples/miniBatchSize; i++){
-        miniBatches.push(trainingData.slice(i,i+miniBatchSize));
-      }
-      for (let miniBatch of miniBatches){
-        this.applyMiniBatch(miniBatch, learningConstant);
-      }
-    }
-  }
-
-  evaluate(testData){
-    // Feeds test data through network and returns how many it guessed correctly.
-    let numOfTests = testData.length;
-    let numOfSuccesses = 0;
-    for (let test of testData){
-      let testOutput = test[1];
-      let highestOutput = 0;
-      let highestIndex;
-      for (let node = 0; node < testOutput.length; node++){
-        if (testOutput[node] > highestOutput){
-          highestOutput = testOutput[node];
-          highestIndex = node;
-        }
-      }
-      let testResult = this.feedforward(test[0]);
-      if (testResult === highestIndex){
-        numOfSuccesses++
-      }
-     }
-     return numOfSuccesses/numOfTests;
-
-  }
-
-
 }
